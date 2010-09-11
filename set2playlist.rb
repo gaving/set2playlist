@@ -1,23 +1,15 @@
 #!/usr/bin/env ruby
 
 require 'rubygems'
-require 'net/https'
-require 'uri'
+require 'appscript'
 require 'json'
-require 'pp'
-require 'uri'
+require 'net/https'
 require 'optparse'
 require 'ostruct'
+require 'pp'
+require 'uri'
 
 PVERSION = "0.1"
-
-if RUBY_PLATFORM =~ /mswin|mingw/
-    require 'win32ole'
-elsif RUBY_PLATFORM =~ /darwin/
-    require 'appscript'
-else
-    raise("Unsupported operating system.")
-end
 
 class String
     def red; colorize(self, "\e[1m\e[31m"); end
