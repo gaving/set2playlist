@@ -35,6 +35,7 @@ class ParseOptions
     def self.parse(args)
         options = OpenStruct.new
         options.playlist_name = 'Setlist'
+        options.play = true
 
         opts = OptionParser.new do |opts|
             opts.banner = "Usage: #{$0} [options]"
@@ -48,8 +49,9 @@ class ParseOptions
             opts.separator " "
             opts.separator "Specific options:"
 
-            opts.on("-n", "--playlist_name", String, "Specifies the playlist name, if not 'Loved' will be used instead.") { |n| options.playlist_name = n }
+            opts.on("-n", "--playlist_name", String, "Specifies the playlist name, if not 'Setlist' will be used instead.") { |n| options.playlist_name = n }
             opts.on("-v", "--[no-]verbose", "Run verbosely") { |v| options.verbose = v }
+            opts.on("-p", "--[no-]play", "Play playlist (default true)") { |p| options.play = p }
             opts.separator " "
 
             opts.separator "Common options:"
@@ -76,15 +78,11 @@ if options.event_id.nil? and options.setlist_id.nil?
     exit 1
 end
 
-# http://www.last.fm/event/1566994+Modest+Mouse+at+HMV+Picture+House+on+29+August+2010
-# http://www.last.fm/event/1667371+Interpol+at+Music+Hall+of+Williamsburg+on+10+September+2010
-
 if not options.event_id.nil? 
     url = URI.parse("http://api.setlist.fm/rest/0.1/setlist/lastFm/#{options.event_id}.json")
 else
     url = URI.parse("http://api.setlist.fm/rest/0.1/setlist/#{options.setlist_id}.json")
 end
-print 
 
 request = Net::HTTP::Get.new(url.request_uri)
 http = Net::HTTP.new(url.host, url.port)
@@ -101,8 +99,8 @@ end
 
 artist = json['setlist']['artist']['@name']
 
-iTunes = Appscript.app("iTunes.app") # get iTunes reference.
-iTunes.launch unless iTunes.is_running? # run iTunes unless if it's already running.
+iTunes = Appscript.app("iTunes.app")
+iTunes.launch unless iTunes.is_running?
 
 playlist = iTunes.playlists[artist].exists ? iTunes.playlists[artist] : nil
 iTunes.delete(playlist) unless playlist.nil?
@@ -132,7 +130,7 @@ json['setlist']['sets']['set'].each do |result|
 
         track_ref = tracks[whose.name.eq(title).and(whose.video_kind.eq(:none)).and(whose.podcast.eq(false))].first
         if not track_ref.exists
-            # Try contains for mixed results
+            # Try contains for some sort of match (mixed results)
             track_ref = tracks[whose.name.contains(title).and(whose.video_kind.contains(:none)).and(whose.podcast.contains(false))].first
         end
 
@@ -148,4 +146,5 @@ json['setlist']['sets']['set'].each do |result|
 end
 
 playlist.delete
-dest_playlist.play
+
+dest_playlist.play if options.play
