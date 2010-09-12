@@ -1,6 +1,6 @@
 # set2playlist
 
-Build an iTunes playlist based of a setlist on setlist.fm
+Build an iTunes playlist based off a setlist.fm setlist
 
 ## install
 
