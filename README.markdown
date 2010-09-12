@@ -4,8 +4,7 @@ Build an iTunes playlist based off a setlist.fm setlist
 
 ## install
 
-* extract the tarball somewhere
-* execute 'set2playlist.rb' either with ./set2playlist.rb or python set2playlist.rb
+* execute 'set2playlist.rb -h'
 
 ## screenshot
 
